@@ -39,6 +39,8 @@ sub _cleanup_sender {
     my( $sender ) = @_;
     my $sender_addr = refaddr( $sender );
 
+    emit( $sender, 'Destroyed', $sender );
+
     foreach my $signal ( keys %{$SENDERS{$sender_addr}} ) {
         foreach my $target ( @{$SENDERS{$sender_addr}{$signal}} ) {
             next unless blessed( $target->[0] );
@@ -108,6 +110,8 @@ sub _bind {
 
     if( !exists $SENDERS{$sender_addr} ) {
         Wx::Event::EVT_DESTROY( $sender, $sender, \&_cleanup_sender );
+        # Destroyed is special because it is emitted by _cleanup_sender above
+        $SENDERS{$sender_addr}{Destroyed} = [];
     }
 
     if( !exists $SENDERS{$sender_addr}{$signal} ) {

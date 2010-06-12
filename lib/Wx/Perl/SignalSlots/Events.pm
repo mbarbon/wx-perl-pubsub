@@ -17,6 +17,11 @@ our %SIGNAL_MAP =
           'Wx::Button' =>
               [ 3, \&Wx::Event::EVT_BUTTON, \&_Wx_Button_Clicked ],
           ],
+    'Destroyed' =>
+        [
+          'Wx::Window' =>
+              [ 3, \&Wx::Event::EVT_DESTROY, \&_Wx_Window_Destroyed ],
+          ],
     'Idle' =>
         [
           'Wx::Window' =>
@@ -42,6 +47,7 @@ our %SIGNAL_MAP =
 sub _Wx_Button_Clicked { emit( $_[0], 'Clicked' ) }
 sub _Wx_ListBox_ItemSelected { emit( $_[0], 'ItemSelected', $_[1]->GetInt ) }
 sub _Wx_Timer_Timeout { emit( $_[0], 'Timeout' ) }
+sub _Wx_Window_Destroyed { emit( $_[0], 'Destroyed', $_[0] ) }
 sub _Wx_Window_Idle { emit( $_[0], 'Idle' ) }
 
 ### END FUNCTIONS ###
@@ -75,6 +81,10 @@ Wx::Perl::SignalSlots::Events - lists the predefined event types
 =for generator EVT_TIMER
 
 =head2 C<Wx::Window>
+
+=head3 C<Destroyed>
+
+=for generator EVT_DESTROY $_[0]
 
 =head3 C<Idle>
 

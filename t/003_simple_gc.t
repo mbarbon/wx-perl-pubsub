@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use Test::More tests => 9;
+use Test::More tests => 11;
 use t::lib::SignalSlots;
 
 use Wx::Perl::SignalSlots qw(:default);
@@ -36,12 +36,18 @@ $button2 = $senders->{$button_addr}{Clicked}[0][0];
 $button2->Destroy;
 is( $senders->{$button_addr}{Clicked}[0][0], undef, 'connection cleaned up after Destroy' );
 
-# check that destroying the source cleans up the signal struc
+# check that destroying the source cleans up the signal structure, also test
+# the Destroyed signal
 my $target2 = Target->new;
 
 subscribe( $button, 'Clicked', $target2, 'handle' );
+subscribe( $button, 'Destroyed', $target2, 'handle1' );
+
+clear_handled;
 simulate_click( $button );
+is_deeply( [ handled ], [] );
 
 ok( scalar keys %$senders, 'found the sender reference' );
 $button->Destroy;
 ok( !scalar keys %$senders, 'sender cleaned up after destroy' );
+is_deeply( [ handled ], [ 'handle1' ] );
