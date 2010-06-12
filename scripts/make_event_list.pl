@@ -9,10 +9,29 @@ use File::Slurp qw(read_file write_file);
 my $file = $ARGV[0];
 my( %map, $map, $functions );
 
-foreach my $line ( <DATA> ) {
-    chomp $line;
+my $contents = read_file( $file );
 
-    my( $event, $class, $macro, $args ) = split /\s+/, $line, 4;
+my( $event, $class, $macro, $args );
+
+foreach my $line ( split /\n+/, $contents ) {
+    if( $line =~ /^=head2 C<([a-zA-Z0-9_:]+)>/ ) {
+        $class = $1;
+        $event = undef;
+        next;
+    }
+
+    if( $line =~ /^=head3 C<([a-zA-Z0-9_]+)>/ ) {
+        $event = $1;
+        next;
+    }
+
+    if( $line =~ /^=for generator (\w+)(?: (.*))?$/ ) {
+        ( $macro, $args ) = ( $1, $2 );
+        die "No class/event" unless $class && $event;
+    } else {
+        next;
+    }
+
     ( my $function = "_${class}_${event}" ) =~ s/::/_/g;
 
     if( $args ) {
@@ -52,17 +71,9 @@ EOT
 EOT
 }
 
-my $contents = read_file( $file );
-
 $contents =~ s{(?<=### BEGIN EVENTS ###).*(?=### END EVENTS ###)}
               {\n\n$map\n}s;
 $contents =~ s{(?<=### BEGIN FUNCTIONS ###).*(?=### END FUNCTIONS ###)}
               {\n\n$functions\n}s;
 
 write_file( $file, $contents );
-
-__END__
-Clicked           Wx::Button         EVT_BUTTON
-ItemSelected      Wx::ListBox        EVT_LISTBOX       $_[1]->GetInt
-Idle              Wx::Window         EVT_IDLE
-Timeout           Wx::Timer          EVT_TIMER
