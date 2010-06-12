@@ -6,7 +6,7 @@ use Exporter 'import';
 
 use Wx;
 
-our @EXPORT = qw(test_frame test_button simulate_click);
+our @EXPORT = qw(test_frame test_button simulate_click handled clear_handled);
 
 my( $frame, $button, $app ) = @_;
 
@@ -26,5 +26,18 @@ sub simulate_click {
 
     $target->GetEventHandler->ProcessEvent( $event );
 }
+
+sub clear_handled { @Target::got = () }
+sub handled { return sort @Target::got }
+
+package Target;
+
+our @got;
+
+sub new { bless {}, shift }
+
+sub handle { main::ok( 1, 'got the signal' ) }
+sub handle1 { push @got, 'handle1' }
+sub handle2 { push @got, 'handle2' }
 
 1;

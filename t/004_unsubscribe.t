@@ -6,16 +6,6 @@ use t::lib::SignalSlots;
 
 use Wx::Perl::SignalSlots qw(:default);
 
-my @got;
-{
-    package Target;
-
-    sub new { bless {}, shift }
-
-    sub handle1 { push @got, 'handle1' }
-    sub handle2 { push @got, 'handle2' }
-}
-
 my $senders = \%Wx::Perl::SignalSlots::SENDERS;
 my $targets = \%Wx::Perl::SignalSlots::TARGETS;
 
@@ -27,28 +17,28 @@ subscribe( test_button, 'Clicked', $target1, 'handle2' );
 subscribe( test_button, 'Clicked', $target1, 'handle2' );
 subscribe( test_button, 'Clicked', $target2, 'handle2' );
 
-@got = ();
+clear_handled;
 simulate_click( test_button );
-is_deeply( [ sort @got ], [ 'handle1', 'handle2', 'handle2', 'handle2' ] );
+is_deeply( [ handled ], [ 'handle1', 'handle2', 'handle2', 'handle2' ] );
 
 unsubscribe( test_button, 'Clicked', $target1, 'handle2' );
 
-@got = ();
+clear_handled;
 simulate_click( test_button );
-is_deeply( [ sort @got ], [ 'handle1', 'handle2' ] );
+is_deeply( [ handled ], [ 'handle1', 'handle2' ] );
 
 unsubscribe( test_button, 'Clicked', $target1, 'handle2' );
 
-@got = ();
+clear_handled;
 simulate_click( test_button );
-is_deeply( [ sort @got ], [ 'handle1', 'handle2' ] );
+is_deeply( [ handled ], [ 'handle1', 'handle2' ] );
 
 unsubscribe( test_button, 'Clicked', $target1, 'handle1' );
 unsubscribe( test_button, 'Clicked', $target2, 'handle2' );
 
-@got = ();
+clear_handled;
 simulate_click( test_button );
-is_deeply( [ sort @got ], [] );
+is_deeply( [ handled ], [] );
 
 # check everything has been cleaned up correctly
 my( $key ) = keys %$senders;

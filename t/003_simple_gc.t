@@ -7,14 +7,6 @@ use t::lib::SignalSlots;
 use Wx::Perl::SignalSlots qw(:default);
 use Scalar::Util qw(refaddr);
 
-{
-    package Target;
-
-    sub new { bless {}, shift }
-
-    sub handle { main::ok( 1, 'got the signal' ) }
-}
-
 my $button = test_button;
 my $button_addr = refaddr( $button );
 my $senders = \%Wx::Perl::SignalSlots::SENDERS;
