@@ -16,10 +16,10 @@ use Wx::Perl::SignalSlots::Events;
 use Scalar::Util qw(refaddr weaken blessed);
 use Exporter 'import';
 
-our @EXPORT_OK = qw(emit subscribe sender);
+our @EXPORT_OK = qw(emit subscribe unsubscribe sender);
 our %EXPORT_TAGS =
   ( all     => \@EXPORT_OK,
-    default => [ 'emit', 'subscribe' ],
+    default => [ 'emit', 'subscribe', 'unsubscribe' ],
     );
 
 # %SENDERS maps senders => signals => target list
@@ -63,6 +63,7 @@ sub _cleanup_target {
     delete $TARGETS{$target_addr};
 }
 
+# removes a single connection
 sub _unbind_signal_addrs {
     my( $sender_addr, $signal, $target_addr ) = @_;
 
@@ -72,21 +73,33 @@ sub _unbind_signal_addrs {
         $targets->[$i][0] = undef;
     }
 
-    return unless my $senders = $TARGETS{$target_addr};
-    return unless my $signals = $senders->{$sender_addr};
-    delete $signals->{$signal};
+    _unbind_target( $sender_addr, $signal, $target_addr );
 }
 
+# sets up garbage collection for a target derived from wxWindow
 sub _bind_target {
     my( $target, $sender, $signal ) = @_;
     my $target_addr = refaddr( $target );
     my $sender_addr = refaddr( $sender );
 
     if( !exists $TARGETS{$target_addr} ) {
+        Wx::Event::EVT_DESTROY( $target, $target, undef );
         Wx::Event::EVT_DESTROY( $target, $target, \&_cleanup_target );
     }
 
     $TARGETS{$target_addr}{$sender_addr}{$signal} ||= 1;
+}
+
+# clean up garbage collection for a target
+sub _unbind_target {
+    my( $sender_addr, $signal, $target_addr ) = @_;
+
+    return unless my $senders = $TARGETS{$target_addr};
+    return unless my $signals = $senders->{$sender_addr};
+
+    delete $senders->{$signal};
+    delete $signals->{$sender_addr} if !keys %$signals;
+    delete $TARGETS{$target_addr} if !keys %$senders;
 }
 
 sub _bind {
@@ -126,6 +139,31 @@ sub subscribe {
                \@dest );
         return;
     }
+}
+
+sub _same_destination {
+    my( $d1, $d2 ) = @_;
+
+    return 0 if $#$d1 != $#$d2 || !defined $d1->[0];
+    return 0 if refaddr( $d1->[0] ) != refaddr( $d2->[0] );
+    return 1 if $#$d1 == 0;
+    return $d1->[1] eq $d2->[1];
+}
+
+sub unsubscribe {
+    my( $sender, $signal, @dest ) = @_;
+    my $sender_addr = refaddr( $sender );
+
+    return unless my $signals = $SENDERS{$sender_addr};
+    return unless my $targets = $signals->{$signal};
+
+    my $dest = \@dest;
+    for( my $i = $#$targets; $i >= 0; --$i ) {
+        next unless _same_destination( $targets->[$i], $dest );
+        $targets->[$i][0] = undef;
+    }
+
+    _unbind_target( $sender_addr, $signal, refaddr( $dest->[0] ) );
 }
 
 sub emit {

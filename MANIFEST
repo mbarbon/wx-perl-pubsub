@@ -8,4 +8,5 @@ scripts/make_event_list.pl
 t/001_load.t
 t/002_base.t
 t/003_simple_gc.t
+t/004_unsubscribe.t
 t/lib/SignalSlots.pm
