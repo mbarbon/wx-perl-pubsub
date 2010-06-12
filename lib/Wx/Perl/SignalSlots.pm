@@ -89,8 +89,8 @@ sub _bind_target {
     $TARGETS{$target_addr}{$sender_addr}{$signal} ||= 1;
 }
 
-sub _bind2 {
-    my( $sender, $signal, $info, $dest ) = @_;
+sub _bind {
+    my( $sender, $signal, $arg_count, $info, $dest ) = @_;
     my $sender_addr = refaddr( $sender );
 
     if( !exists $SENDERS{$sender_addr} ) {
@@ -98,27 +98,13 @@ sub _bind2 {
     }
 
     if( !exists $SENDERS{$sender_addr}{$signal} ) {
-        $info->[1]->( $sender, $info->[2] );
-    }
-
-    push @{$SENDERS{$sender_addr}{$signal} ||= []}, $dest;
-    weaken( $SENDERS{$sender_addr}{$signal}[-1][0] );
-
-    if( blessed( $dest->[0] ) && $dest->[0]->isa( 'Wx::Window' ) ) {
-        _bind_target( $dest->[0], $sender, $signal );
-    }
-}
-
-sub _bind3 {
-    my( $sender, $signal, $info, $dest ) = @_;
-    my $sender_addr = refaddr( $sender );
-
-    if( !exists $SENDERS{$sender_addr} ) {
-        Wx::Event::EVT_DESTROY( $sender, $sender, \&_cleanup_sender );
-    }
-
-    if( !exists $SENDERS{$sender_addr}{$signal} ) {
-        $info->[1]->( $sender, $sender, $info->[2] );
+        if( $arg_count == 2 ) {
+            $info->[1]->( $sender, $info->[2] );
+        } elsif( $arg_count == 3 ) {
+            $info->[1]->( $sender, $sender, $info->[2] );
+        } else {
+            die "Invalid signal entry for '$signal'";
+        }
     }
 
     push @{$SENDERS{$sender_addr}{$signal} ||= []}, $dest;
@@ -131,20 +117,14 @@ sub _bind3 {
 
 sub subscribe {
     my( $sender, $signal, @dest ) = @_;
-    my $entry = $SIGNAL_MAP{$signal} or die "Invalid signal name: $signal";
+    my $entry = $SIGNAL_MAP{$signal} or die "Invalid signal name: '$signal'";
 
     for( my $i = 0; $i < $#$entry; ++$i ) {
         next unless $sender->isa( $entry->[$i] );
 
-        if( $entry->[$i + 1][0] == 3 ) {
-            _bind3( $sender, $signal, $entry->[$i + 1], \@dest );
-            return;
-        } elsif( $entry->[$i + 1][0] == 2 ) {
-            _bind2( $sender, $signal, $entry->[$i + 1], \@dest );
-            return;
-        }
-
-        die "Invalid signal entry";
+        _bind( $sender, $signal, $entry->[$i + 1][0], $entry->[$i + 1],
+               \@dest );
+        return;
     }
 }
 
