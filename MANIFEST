@@ -1,0 +1,8 @@
+Build.PL
+MANIFEST
+META.yml
+lib/Wx/Perl/SignalSlots.pm
+lib/Wx/Perl/SignalSlots/Events.pm
+scripts/make_event_list.pl
+t/001_load.t
+t/002_base.t
