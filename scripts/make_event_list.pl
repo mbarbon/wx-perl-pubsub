@@ -9,7 +9,7 @@ use File::Slurp qw(read_file write_file);
 my $file = $ARGV[0];
 my( %map, $map, $functions );
 
-my $contents = read_file( $file );
+my $contents = my $original_contents = read_file( $file );
 
 my( $event, $class, $macro, $args );
 
@@ -76,4 +76,7 @@ $contents =~ s{(?<=### BEGIN EVENTS ###).*(?=### END EVENTS ###)}
 $contents =~ s{(?<=### BEGIN FUNCTIONS ###).*(?=### END FUNCTIONS ###)}
               {\n\n$functions\n}s;
 
-write_file( $file, $contents );
+if( $original_contents ne $contents ) {
+    print "Writing updated '$file'\n";
+    write_file( $file, $contents );
+}

@@ -3,7 +3,20 @@
 use strict;
 use Module::Build;
 
-my $build = Module::Build->new
+my $class = Module::Build->subclass
+  ( class       => 'My::Build',
+    code        => <<'EOT',
+sub ACTION_code {
+    my( $self ) = @_;
+
+    $self->SUPER::ACTION_code;
+    $self->do_system( $^X, 'scripts/make_event_list.pl',
+                           'lib/Wx/Perl/SignalSlots/Events.pm' );
+}
+EOT
+    );
+
+my $build = $class->new
   ( module_name => 'Wx::Perl::SignalSlots',
     license     => 'perl',
     requires    => { 'Wx'       => 0,
