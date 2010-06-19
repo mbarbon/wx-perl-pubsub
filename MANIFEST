@@ -9,4 +9,5 @@ t/001_load.t
 t/002_base.t
 t/003_simple_gc.t
 t/004_unsubscribe.t
+t/005_unsubscribe_wildcards.t
 t/lib/PubSub.pm

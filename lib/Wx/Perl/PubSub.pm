@@ -217,30 +217,92 @@ sub _same_destination {
     return $d1->[1] eq $d2->[1];
 }
 
+sub _same_destination_wildcard {
+    my( $d1, $d2 ) = @_;
+
+    return 0 if !defined $d1->[0];
+    return 1 if $#$d2 == -1;
+    return 0 if $#$d1 != $#$d2;
+    return 0 if refaddr( $d1->[0] ) != refaddr( $d2->[0] || $d1->[0] );
+    return 1 if $#$d1 == 0;
+    return $d1->[1] eq ( $d2->[1] || $d1->[1] );
+}
+
 =head2 C<unsubscribe>
 
     unsubscribe( $sender, 'SignalName', $object, 'MethodName' );
     unsubscribe( $sender, 'SignalName', \&_function );
 
-Removes a connection created by C<subscribe>.  If there is no matching
-connection the call does nothing.
+Removes a connection created by C<subscribe>.  Does nothing if there
+is no matching connection.
+
+C<undef> can be used in place of any argument as a wildcard, for example:
+
+    # disconnects all receivers subscribed to this sender
+    unsubscribe( $sender );
+
+    # disconnects all receivers subscribed to a signal
+    unsubscribe( $sender, 'SignalName' );
+
+    # disconnects a receiver from all signals of a sender
+    unsubscribe( $sender, undef, $receiver, undef );
+
+Note:
+
+   # disconnects all receivers
+   unsubscribe( $sender, 'SignalName' );
+
+   # disconnects receivers that are code references
+   unsubscribe( $sender, 'SignalName', undef );
+
+   # disconnects receivers that are method calls
+   unsubscribe( $sender, 'SignalName', undef, undef );
 
 =cut
 
-sub unsubscribe {
-    my( $sender, $signal, @dest ) = @_;
-    my $sender_addr = refaddr( $sender );
+sub _unsubscribe_sender_signal {
+    my( $sender_addr, $signal, $dest ) = @_;
 
     return unless my $signals = $SENDERS{$sender_addr};
     return unless my $targets = $signals->{$signal};
 
-    my $dest = \@dest;
     for( my $i = $#$targets; $i >= 0; --$i ) {
         next unless _same_destination( $targets->[$i], $dest );
         $targets->[$i][0] = undef;
     }
 
     _unbind_target( $sender_addr, $signal, refaddr( $dest->[0] ) );
+}
+
+sub _unsubscribe_wildcard {
+    my( $_sender, $_signal, $dest ) = @_;
+
+    # not the most efficient way, but should be adequate for most uses
+    foreach my $sender_addr ( $_sender ? refaddr( $_sender ) : keys %SENDERS ) {
+        next unless my $signals = $SENDERS{$sender_addr};
+
+        foreach my $signal ( $_signal ? $_signal : keys %{$SENDERS{$sender_addr}} ) {
+            next unless my $targets = $signals->{$signal};
+
+            for( my $i = $#$targets; $i >= 0; --$i ) {
+                next unless _same_destination_wildcard( $targets->[$i], $dest );
+                _unbind_target( $sender_addr, $signal, refaddr( $targets->[$i][0] ) );
+
+                $targets->[$i][0] = undef;
+            }
+        }
+    }
+}
+
+sub unsubscribe {
+    my( $sender, $signal, @dest ) = @_;
+    my $dest = \@dest;
+
+    # all arguments specified: disconnect a single connection
+    return _unsubscribe_sender_signal( refaddr( $sender ), $signal, $dest )
+      if $sender && $signal && ( !grep !$_, @dest );
+
+    return _unsubscribe_wildcard( $sender, $signal, $dest );
 }
 
 sub emit {
