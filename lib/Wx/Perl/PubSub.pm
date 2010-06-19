@@ -11,7 +11,7 @@ Wx::Perl::PubSub - alternative event dispatching for wxPerl
 
 =head1 SYNOPSIS
 
-    use Wx::Perl::PubSub qw(:default);
+    use Wx::Perl::PubSub qw(:local);
 
     my $frame = MyFrame->new( ... );
     my $listbox = Wx::ListBox->new( $frame, -1, ... );
@@ -25,6 +25,16 @@ Wx::Perl::PubSub - alternative event dispatching for wxPerl
 
         # ...
     }
+
+    # as an alternative, subscribe/unsubscribe can be added to all
+    # wxWidgets event-emitting classes
+
+    use Wx::Perl::PubSub qw(:global);
+
+    my $frame = MyFrame->new( ... );
+    my $listbox = Wx::ListBox->new( $frame, -1, ... );
+
+    $listbox->subscribe( 'ItemSelected', $frame, 'OnItemSelected' );
 
 =head1 DESCRIPTION
 
@@ -55,13 +65,28 @@ No need to import the various C<EVT_FOO> binders.
 use Wx::Event qw();
 use Wx::Perl::PubSub::Events;
 use Scalar::Util qw(refaddr weaken blessed);
-use Exporter 'import';
+use Exporter qw();
 
-our @EXPORT_OK = qw(emit subscribe unsubscribe sender);
+our @EXPORT_OK = qw(emit subscribe unsubscribe sender wx_event);
 our %EXPORT_TAGS =
   ( all     => \@EXPORT_OK,
-    default => [ 'emit', 'subscribe', 'unsubscribe' ],
+    local   => [ 'subscribe', 'unsubscribe' ],
+    global  => [], # hack for :global
     );
+
+sub import {
+    my( $class, @args ) = @_;
+
+    if( grep /^:global$/, @args ) {
+        no warnings 'redefine';
+
+        *Wx::EvtHandler::subscribe = \&subscribe;
+        *Wx::EvtHandler::unsubscribe = \&unsubscribe;
+        *Wx::EvtHandler::emit = \&emit;
+    }
+
+    goto &Exporter::import;
+}
 
 # %SENDERS maps senders => signals => target list
 # the target list contains array references with either one or two elements:

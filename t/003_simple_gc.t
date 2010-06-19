@@ -4,7 +4,7 @@ use strict;
 use Test::More tests => 11;
 use t::lib::PubSub;
 
-use Wx::Perl::PubSub qw(:default);
+use Wx::Perl::PubSub qw(:local);
 use Scalar::Util qw(refaddr);
 
 my $button = test_button;

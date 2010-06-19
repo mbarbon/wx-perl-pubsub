@@ -4,7 +4,7 @@ use strict;
 use Test::More tests => 6;
 use t::lib::PubSub;
 
-use Wx::Perl::PubSub qw(:default);
+use Wx::Perl::PubSub qw(:local);
 
 my $senders = \%Wx::Perl::PubSub::SENDERS;
 my $targets = \%Wx::Perl::PubSub::TARGETS;
