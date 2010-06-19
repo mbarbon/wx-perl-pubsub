@@ -1,4 +1,4 @@
-package Wx::Perl::SignalSlots;
+package Wx::Perl::PubSub;
 
 use strict;
 use warnings;
@@ -7,11 +7,11 @@ our $VERSION = '0.01';
 
 =head1 NAME
 
-Wx::Perl::SignalSlots - alternative event dispatching for wxPerl
+Wx::Perl::PubSub - alternative event dispatching for wxPerl
 
 =head1 SYNOPSIS
 
-    use Wx::Perl::SignalSlots qw(:default);
+    use Wx::Perl::PubSub qw(:default);
 
     my $frame = MyFrame->new( ... );
     my $listbox = Wx::ListBox->new( $frame, -1, ... );
@@ -53,7 +53,7 @@ No need to import the various C<EVT_FOO> binders.
 =cut
 
 use Wx::Event qw();
-use Wx::Perl::SignalSlots::Events;
+use Wx::Perl::PubSub::Events;
 use Scalar::Util qw(refaddr weaken blessed);
 use Exporter 'import';
 
@@ -73,7 +73,7 @@ our %EXPORT_TAGS =
 # it only contains entries for C<Wx::Window>-derived objects and is used
 # to cleanup object references when the window is destroyed
 our( %SENDERS, %TARGETS, %SIGNAL_MAP );
-*SIGNAL_MAP = \%Wx::Perl::SignalSlots::Events::SIGNAL_MAP;
+*SIGNAL_MAP = \%Wx::Perl::PubSub::Events::SIGNAL_MAP;
 
 # called when a sender is destroyed to remove all references to it
 sub _cleanup_sender {
@@ -191,7 +191,7 @@ Both sender and receiver converted into weak references; if a window
 is destroyed or an object is garbage collected all the associated
 connections are automatically removed.
 
-The available events are listed in L<Wx::Perl::SignalSlots::Events>.
+The available events are listed in L<Wx::Perl::PubSub::Events>.
 
 =cut
 
@@ -268,7 +268,7 @@ sub emit {
 
 =head1 SEE ALSO
 
-L<Wx::Perl::SignalSlots::Events> for the list of supported events.
+L<Wx::Perl::PubSub::Events> for the list of supported events.
 
 =head1 AUTHOR
 

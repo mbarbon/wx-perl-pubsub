@@ -1,11 +1,11 @@
-package Wx::Perl::SignalSlots::Events;
+package Wx::Perl::PubSub::Events;
 
 use strict;
 use warnings;
 
 use Wx::Event qw();
 
-*emit = \&Wx::Perl::SignalSlots::emit;
+*emit = \&Wx::Perl::PubSub::emit;
 
 our %SIGNAL_MAP =
   (
@@ -29,6 +29,10 @@ our %SIGNAL_MAP =
           ],
     'ItemSelected' =>
         [
+          'Wx::Choice' =>
+              [ 3, \&Wx::Event::EVT_CHOICE, \&_Wx_Choice_ItemSelected ],
+          'Wx::ComboBox' =>
+              [ 3, \&Wx::Event::EVT_COMBOBOX, \&_Wx_ComboBox_ItemSelected ],
           'Wx::ListBox' =>
               [ 3, \&Wx::Event::EVT_LISTBOX, \&_Wx_ListBox_ItemSelected ],
           ],
@@ -45,6 +49,8 @@ our %SIGNAL_MAP =
 ### BEGIN FUNCTIONS ###
 
 sub _Wx_Button_Clicked { emit( $_[0], 'Clicked' ) }
+sub _Wx_Choice_ItemSelected { emit( $_[0], 'ItemSelected', $_[1]->GetInt ) }
+sub _Wx_ComboBox_ItemSelected { emit( $_[0], 'ItemSelected', $_[1]->GetInt ) }
 sub _Wx_ListBox_ItemSelected { emit( $_[0], 'ItemSelected', $_[1]->GetInt ) }
 sub _Wx_Timer_Timeout { emit( $_[0], 'Timeout' ) }
 sub _Wx_Window_Destroyed { emit( $_[0], 'Destroyed', $_[0] ) }
@@ -58,7 +64,7 @@ __DATA__
 
 =head1 NAME
 
-Wx::Perl::SignalSlots::Events - lists the predefined event types
+Wx::Perl::PubSub::Events - lists the predefined event types
 
 =head1 CLASSES
 
@@ -69,6 +75,24 @@ Wx::Perl::SignalSlots::Events - lists the predefined event types
 =for generator EVT_BUTTON
 
 Emitted when a push button is clicked.
+
+=head2 C<Wx::Choice>
+
+=head3 C<ItemSelected( $index )>
+
+=for generator EVT_CHOICE $_[1]->GetInt
+
+Emitted when a choice item is selected; takes the item index as
+parameter.
+
+=head2 C<Wx::ComboBox>
+
+=head3 C<ItemSelected( $index )>
+
+=for generator EVT_COMBOBOX $_[1]->GetInt
+
+Emitted when a combo box item is selected; takes the item index as
+parameter.
 
 =head2 C<Wx::ListBox>
 

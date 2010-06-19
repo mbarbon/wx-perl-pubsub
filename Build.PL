@@ -11,13 +11,13 @@ sub ACTION_code {
 
     $self->SUPER::ACTION_code;
     $self->do_system( $^X, 'scripts/make_event_list.pl',
-                           'lib/Wx/Perl/SignalSlots/Events.pm' );
+                           'lib/Wx/Perl/PubSub/Events.pm' );
 }
 EOT
     );
 
 my $build = $class->new
-  ( module_name => 'Wx::Perl::SignalSlots',
+  ( module_name => 'Wx::Perl::PubSub',
     license     => 'perl',
     requires    => { 'Wx'       => 0,
                      'Exporter' => '5.57',

@@ -2,12 +2,12 @@
 
 use strict;
 use Test::More tests => 7;
-use t::lib::SignalSlots;
+use t::lib::PubSub;
 
-use Wx::Perl::SignalSlots qw(:default);
+use Wx::Perl::PubSub qw(:default);
 
-my $senders = \%Wx::Perl::SignalSlots::SENDERS;
-my $targets = \%Wx::Perl::SignalSlots::TARGETS;
+my $senders = \%Wx::Perl::PubSub::SENDERS;
+my $targets = \%Wx::Perl::PubSub::TARGETS;
 
 my $target1 = Target->new;
 my $target2 = Target->new;

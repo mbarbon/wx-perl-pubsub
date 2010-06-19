@@ -1,4 +1,4 @@
-package t::lib::SignalSlots;
+package t::lib::PubSub;
 
 use strict;
 use warnings;

@@ -4,7 +4,7 @@ use strict;
 use Test::More tests => 2;
 
 use Wx;
-use Wx::Perl::SignalSlots qw(:default);
+use Wx::Perl::PubSub qw(:default);
 
 {
     package MyFrame;

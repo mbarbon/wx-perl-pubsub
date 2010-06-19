@@ -2,14 +2,14 @@
 
 use strict;
 use Test::More tests => 11;
-use t::lib::SignalSlots;
+use t::lib::PubSub;
 
-use Wx::Perl::SignalSlots qw(:default);
+use Wx::Perl::PubSub qw(:default);
 use Scalar::Util qw(refaddr);
 
 my $button = test_button;
 my $button_addr = refaddr( $button );
-my $senders = \%Wx::Perl::SignalSlots::SENDERS;
+my $senders = \%Wx::Perl::PubSub::SENDERS;
 
 # when the target is a plain Perl object, check that GC works
 my $target = Target->new;

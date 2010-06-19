@@ -2,11 +2,11 @@ Build.PL
 MANIFEST
 MANIFEST.SKIP
 META.yml
-lib/Wx/Perl/SignalSlots.pm
-lib/Wx/Perl/SignalSlots/Events.pm
+lib/Wx/Perl/PubSub.pm
+lib/Wx/Perl/PubSub/Events.pm
 scripts/make_event_list.pl
 t/001_load.t
 t/002_base.t
 t/003_simple_gc.t
 t/004_unsubscribe.t
-t/lib/SignalSlots.pm
+t/lib/PubSub.pm
