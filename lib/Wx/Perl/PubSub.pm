@@ -97,7 +97,7 @@ sub import {
 # %TARGETS maps targets => senders => signals
 # it only contains entries for C<Wx::Window>-derived objects and is used
 # to cleanup object references when the window is destroyed
-our( %SENDERS, %TARGETS, %SIGNAL_MAP );
+our( %SENDERS, %TARGETS, %SIGNAL_MAP, $SENDER, $WX_EVENT );
 *SIGNAL_MAP = \%Wx::Perl::PubSub::Events::SIGNAL_MAP;
 
 # called when a sender is destroyed to remove all references to it
@@ -330,12 +330,36 @@ sub unsubscribe {
     return _unsubscribe_wildcard( $sender, $signal, $dest );
 }
 
+=head2 C<sender> and C<wx_event>
+
+    sub _Receiver {
+        my( $self ) = @_;
+
+        my $sender = Wx::Perl::PubSub::sender();
+        my $wx_event = Wx::Perl::PubSub::wx_event();
+
+        # do something
+    }
+
+Use of these functions is discouraged, they are provided because there
+are some limited cases where they are needed.
+
+They can only be used inside a signal receiver to retrieve the
+object that sent the signal and the original wxWidgets event object that
+triggered the signal.
+
+=cut
+
+sub sender { $SENDER }
+sub wx_event { $WX_EVENT }
+
 sub emit {
     my( $sender, $signal, @args ) = @_;
     my $sender_addr = refaddr( $sender );
 
     return unless $SENDERS{$sender_addr} && $SENDERS{$sender_addr}{$signal};
 
+    local $SENDER = $sender;
     my $targets = $SENDERS{$sender_addr}{$signal};
     for( my $i = $#$targets; $i >= 0; --$i ) {
         my $receiver = $targets->[$i];
@@ -351,6 +375,13 @@ sub emit {
             $receiver->[0]->( @args );
         }
     }
+}
+
+sub emit_event {
+    my( $sender, $event, $signal, @args ) = @_;
+
+    local $WX_EVENT = $event;
+    emit( $sender, $signal, @args );
 }
 
 =head1 SEE ALSO

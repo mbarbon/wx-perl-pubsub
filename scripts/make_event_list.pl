@@ -36,11 +36,11 @@ foreach my $line ( split /\n+/, $contents ) {
 
     if( $args ) {
         $functions .= <<EOT
-sub $function { emit( \$_[0], '$event', $args ) }
+sub $function { emit_event( \$_[0], \$_[1], '$event', $args ) }
 EOT
     } else {
         $functions .= <<EOT
-sub $function { emit( \$_[0], '$event' ) }
+sub $function { emit_event( \$_[0], \$_[1], '$event' ) }
 EOT
     }
 

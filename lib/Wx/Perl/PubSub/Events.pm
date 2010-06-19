@@ -5,7 +5,7 @@ use warnings;
 
 use Wx::Event qw();
 
-*emit = \&Wx::Perl::PubSub::emit;
+*emit_event = \&Wx::Perl::PubSub::emit_event;
 
 our %SIGNAL_MAP =
   (
@@ -48,13 +48,13 @@ our %SIGNAL_MAP =
 
 ### BEGIN FUNCTIONS ###
 
-sub _Wx_Button_Clicked { emit( $_[0], 'Clicked' ) }
-sub _Wx_Choice_ItemSelected { emit( $_[0], 'ItemSelected', $_[1]->GetInt ) }
-sub _Wx_ComboBox_ItemSelected { emit( $_[0], 'ItemSelected', $_[1]->GetInt ) }
-sub _Wx_ListBox_ItemSelected { emit( $_[0], 'ItemSelected', $_[1]->GetInt ) }
-sub _Wx_Timer_Timeout { emit( $_[0], 'Timeout' ) }
-sub _Wx_Window_Destroyed { emit( $_[0], 'Destroyed', $_[0] ) }
-sub _Wx_Window_Idle { emit( $_[0], 'Idle' ) }
+sub _Wx_Button_Clicked { emit_event( $_[0], $_[1], 'Clicked' ) }
+sub _Wx_Choice_ItemSelected { emit_event( $_[0], $_[1], 'ItemSelected', $_[1]->GetInt ) }
+sub _Wx_ComboBox_ItemSelected { emit_event( $_[0], $_[1], 'ItemSelected', $_[1]->GetInt ) }
+sub _Wx_ListBox_ItemSelected { emit_event( $_[0], $_[1], 'ItemSelected', $_[1]->GetInt ) }
+sub _Wx_Timer_Timeout { emit_event( $_[0], $_[1], 'Timeout' ) }
+sub _Wx_Window_Destroyed { emit_event( $_[0], $_[1], 'Destroyed', $_[0] ) }
+sub _Wx_Window_Idle { emit_event( $_[0], $_[1], 'Idle' ) }
 
 ### END FUNCTIONS ###
 
