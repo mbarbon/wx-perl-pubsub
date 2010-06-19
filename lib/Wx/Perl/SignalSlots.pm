@@ -9,6 +9,47 @@ our $VERSION = '0.01';
 
 Wx::Perl::SignalSlots - alternative event dispatching for wxPerl
 
+=head1 SYNOPSIS
+
+    use Wx::Perl::SignalSlots qw(:default);
+
+    my $frame = MyFrame->new( ... );
+    my $listbox = Wx::ListBox->new( $frame, -1, ... );
+
+    subscribe( $listbox, 'ItemSelected', $frame, 'OnItemSelected' );
+
+    # in MyFrame.pm
+
+    sub OnItemSelected {
+        my( $self, $index ) = @_;
+
+        # ...
+    }
+
+=head1 DESCRIPTION
+
+This module implements an alternative event hanling model for wxPerl,
+in some ways similar to Qt signal/slot mechanism.  The advantages
+compared to wxWidgets/wxPerl standard event handling are:
+
+=over 4
+
+=item simpler
+
+No need to deal with wxWidgets event objects.
+
+=item multicast
+
+The C<EVT_FOO> binders can only bind an event once per object.
+
+=item cleaner
+
+No need to import the various C<EVT_FOO> binders.
+
+=back
+
+=head1 FUNCTIONS
+
 =cut
 
 use Wx::Event qw();
@@ -132,6 +173,28 @@ sub _bind {
     }
 }
 
+=head2 C<subscribe>
+
+    subscribe( $sender, 'SignalName', $object, 'MethodName' );
+    subscribe( $sender, 'SignalName', \&_function );
+
+Connects a signal to a receiver.  Every time the signal is emitted,
+the receiver method/function will be called with zero or more
+arguments specific to the signal (for example the C<Clicked> signal
+takes no arguments while the C<ItemSelected> signal takes the item
+index as argument).
+
+When multiple receivers are connected to the same sender/signal, the
+call order is undefined.
+
+Both sender and receiver converted into weak references; if a window
+is destroyed or an object is garbage collected all the associated
+connections are automatically removed.
+
+The available events are listed in L<Wx::Perl::SignalSlots::Events>.
+
+=cut
+
 sub subscribe {
     my( $sender, $signal, @dest ) = @_;
     my $entry = $SIGNAL_MAP{$signal} or die "Invalid signal name: '$signal'";
@@ -153,6 +216,16 @@ sub _same_destination {
     return 1 if $#$d1 == 0;
     return $d1->[1] eq $d2->[1];
 }
+
+=head2 C<unsubscribe>
+
+    unsubscribe( $sender, 'SignalName', $object, 'MethodName' );
+    unsubscribe( $sender, 'SignalName', \&_function );
+
+Removes a connection created by C<subscribe>.  If there is no matching
+connection the call does nothing.
+
+=cut
 
 sub unsubscribe {
     my( $sender, $signal, @dest ) = @_;
@@ -192,5 +265,20 @@ sub emit {
         }
     }
 }
+
+=head1 SEE ALSO
+
+L<Wx::Perl::SignalSlots::Events> for the list of supported events.
+
+=head1 AUTHOR
+
+Mattia Barbon <mbarbon@cpan.org>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
 
 1;

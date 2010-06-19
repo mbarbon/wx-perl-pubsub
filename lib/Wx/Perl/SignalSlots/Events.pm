@@ -64,28 +64,42 @@ Wx::Perl::SignalSlots::Events - lists the predefined event types
 
 =head2 C<Wx::Button>
 
-=head3 C<Clicked>
+=head3 C<Clicked()>
 
 =for generator EVT_BUTTON
 
+Emitted when a push button is clicked.
+
 =head2 C<Wx::ListBox>
 
-=head3 C<ItemSelected>
+=head3 C<ItemSelected( $index )>
 
 =for generator EVT_LISTBOX $_[1]->GetInt
 
+Emitted when a list box item is selected; takes the item index as
+parameter.
+
 =head2 C<Wx::Timer>
 
-=head3 C<Timeout>
+=head3 C<Timeout()>
 
 =for generator EVT_TIMER
 
+Emitted every time the timer timeout expires.
+
 =head2 C<Wx::Window>
 
-=head3 C<Destroyed>
+=head3 C<Destroyed( $object )>
 
 =for generator EVT_DESTROY $_[0]
 
-=head3 C<Idle>
+Emitted when a C<Wx::Window> derived class is destroyed.  Note that
+the object passed to the signal might not be blessed in the correct
+class, and no method must be called on it.
+
+=head3 C<Idle()>
 
 =for generator EVT_IDLE
+
+Emitted every time the event loop stops because there are no more
+events to process.

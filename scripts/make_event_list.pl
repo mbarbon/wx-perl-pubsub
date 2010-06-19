@@ -20,7 +20,7 @@ foreach my $line ( split /\n+/, $contents ) {
         next;
     }
 
-    if( $line =~ /^=head3 C<([a-zA-Z0-9_]+)>/ ) {
+    if( $line =~ /^=head3 C<([a-zA-Z0-9_]+)\([^)]*\)>/ ) {
         $event = $1;
         next;
     }

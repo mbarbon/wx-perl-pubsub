@@ -11,7 +11,7 @@ use Wx::Perl::SignalSlots qw(:default);
 
     use base 'Wx::Frame';
 
-    sub _Idle { main::ok( 1 ) }
+    sub _Idle { main::ok( 1, 'method' ) }
 }
 
 my $app = Wx::SimpleApp->new;
@@ -19,7 +19,7 @@ my $frame = MyFrame->new( undef, -1, "Frame" );
 
 subscribe( $frame, 'Idle', $frame, 'Destroy' );
 subscribe( $frame, 'Idle', $frame, '_Idle' );
-subscribe( $frame, 'Idle', sub { ok( 1 ) } );
+subscribe( $frame, 'Idle', sub { ok( 1, 'anonymous sub' ) } );
 
 $frame->Show;
 $app->MainLoop;
