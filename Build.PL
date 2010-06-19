@@ -22,5 +22,11 @@ my $build = $class->new
     requires    => { 'Wx'       => 0,
                      'Exporter' => '5.57',
                      },
+    meta_merge  =>
+        { resources => { 'license'       => 'http://dev.perl.org/licenses/',
+                         'repository'    => 'http://github.com/mbarbon/wx-perl-pubsub',
+                         'MailingList'   => 'http://lists.perl.org/list/wxperl-users.html',
+                         },
+          },
     );
 $build->create_build_script;
