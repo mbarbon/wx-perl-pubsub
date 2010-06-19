@@ -7,7 +7,7 @@ use Wx;
 use File::Slurp qw(read_file write_file);
 
 my $file = $ARGV[0];
-my( %map, $map, $functions );
+my( %map, %emit_code, $map, $functions );
 
 my $contents = my $original_contents = read_file( $file );
 
@@ -34,14 +34,11 @@ foreach my $line ( split /\n+/, $contents ) {
 
     ( my $function = "_${class}_${event}" ) =~ s/::/_/g;
 
+    my $emit_code;
     if( $args ) {
-        $functions .= <<EOT
-sub $function { emit_event( \$_[0], \$_[1], '$event', $args ) }
-EOT
+        $emit_code = "emit_event( \$_[0], \$_[1], '$event', $args ); "
     } else {
-        $functions .= <<EOT
-sub $function { emit_event( \$_[0], \$_[1], '$event' ) }
-EOT
+        $emit_code = "emit_event( \$_[0], \$_[1], '$event' ); "
     }
 
     my $macro_ref = do {
@@ -49,7 +46,16 @@ EOT
         \&{"Wx::Event::$macro"};
     };
 
-    $map{$event}{$class} = [ length prototype $macro_ref, $macro, $function ];
+    $emit_code{$macro} ||= [ $function, '' ];
+    $emit_code{$macro}[1] .= $emit_code;
+    $map{$event}{$class} = [ length prototype $macro_ref, $macro,
+                             $emit_code{$macro}[0] ];
+}
+
+foreach my $f ( sort { $a->[0] cmp $b->[0] } values %emit_code ) {
+    $functions .= <<EOT;
+sub $f->[0] { $f->[1]}
+EOT
 }
 
 foreach my $event ( sort keys %map ) {

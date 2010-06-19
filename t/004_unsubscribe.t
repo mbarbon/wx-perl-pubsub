@@ -45,4 +45,4 @@ my( $key ) = keys %$senders;
 
 is_deeply( [ keys %$targets ], [] );
 is_deeply( [ keys %$senders ], [ $key ] );
-is_deeply( $senders->{$key}, { Clicked => [], Destroyed => [] } );
+is_deeply( $senders->{$key}, { Clicked => [] } );

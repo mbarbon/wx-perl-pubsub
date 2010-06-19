@@ -97,8 +97,9 @@ sub import {
 # %TARGETS maps targets => senders => signals
 # it only contains entries for C<Wx::Window>-derived objects and is used
 # to cleanup object references when the window is destroyed
-our( %SENDERS, %TARGETS, %SIGNAL_MAP, $SENDER, $WX_EVENT );
+our( %SENDERS, %TARGETS, %SIGNAL_MAP, %BOUND, $SENDER, $WX_EVENT );
 *SIGNAL_MAP = \%Wx::Perl::PubSub::Events::SIGNAL_MAP;
+my $DESTROY_ADDR = refaddr( \&Wx::Event::EVT_DESTROY );
 
 # called when a sender is destroyed to remove all references to it
 sub _cleanup_sender {
@@ -115,6 +116,7 @@ sub _cleanup_sender {
     }
 
     delete $SENDERS{$sender_addr};
+    delete $BOUND{$sender_addr};
 }
 
 # called when a target is destroyed to remove all references to it
@@ -173,14 +175,15 @@ sub _unbind_target {
 sub _bind {
     my( $sender, $signal, $arg_count, $info, $dest ) = @_;
     my $sender_addr = refaddr( $sender );
+    my $bind_addr = refaddr( $info->[1] );
 
     if( !exists $SENDERS{$sender_addr} ) {
         Wx::Event::EVT_DESTROY( $sender, $sender, \&_cleanup_sender );
         # Destroyed is special because it is emitted by _cleanup_sender above
-        $SENDERS{$sender_addr}{Destroyed} = [];
+        $BOUND{$sender_addr}{$DESTROY_ADDR} = 1;
     }
 
-    if( !exists $SENDERS{$sender_addr}{$signal} ) {
+    if( !exists $BOUND{$sender_addr}{$bind_addr} ) {
         if( $arg_count == 2 ) {
             $info->[1]->( $sender, $info->[2] );
         } elsif( $arg_count == 3 ) {
@@ -188,6 +191,7 @@ sub _bind {
         } else {
             die "Invalid signal entry for '$signal'";
         }
+        $BOUND{$sender_addr}{$bind_addr} = 1;
     }
 
     push @{$SENDERS{$sender_addr}{$signal} ||= []}, $dest;
