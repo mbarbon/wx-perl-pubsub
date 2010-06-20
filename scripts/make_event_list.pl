@@ -11,14 +11,14 @@ my( %map, %emit_code, $map, $functions );
 
 my $contents = my $original_contents = read_file( $file );
 
-my( $event, $class, $macro, $args, $line_count );
+my( $event, $class, $macro, $args, $sub, $line_count );
 
 foreach my $line ( split /\n/, $contents ) {
     ++$line_count;
 
     if( $line =~ /^=head2 C<([a-zA-Z0-9_:]+)>/ ) {
         $class = $1;
-        $event = undef;
+        $event = $macro = $sub = $args = undef;
         next;
     }
 
@@ -27,20 +27,27 @@ foreach my $line ( split /\n/, $contents ) {
         next;
     }
 
-    if( $line =~ /^=for generator (\w+)(?: (.*))?$/ ) {
+    if( $line =~ /^=for generator (\w+)\s+bind\s+(\w+)$/ ) {
+        ( $macro, $sub ) = ( $1, $2 );
+        die "No class/event at line $line_count" unless $class && $event;
+    } elsif( $line =~ /^=for generator (\w+)(?: (.*))?$/ ) {
         ( $macro, $args ) = ( $1, $2 );
         die "No class/event at line $line_count" unless $class && $event;
     } else {
         next;
     }
 
-    ( my $function = "_${class}_${event}" ) =~ s/::/_/g;
-
-    my $emit_code;
-    if( $args ) {
-        $emit_code = "emit_event( \$_[0], \$_[1], '$event', $args ); "
+    my( $emit_code, $function ) = ( '', undef );
+    if( $sub ) {
+        $function = $sub;
     } else {
-        $emit_code = "emit_event( \$_[0], \$_[1], '$event' ); "
+        ( $function = "_${class}_${event}" ) =~ s/::/_/g;
+
+        if( $args ) {
+            $emit_code = "emit_event( \$_[0], \$_[1], '$event', $args ); "
+        } else {
+            $emit_code = "emit_event( \$_[0], \$_[1], '$event' ); "
+        }
     }
 
     my $macro_ref = do {
@@ -58,6 +65,7 @@ foreach my $line ( split /\n/, $contents ) {
 }
 
 foreach my $f ( sort { $a->[0] cmp $b->[0] } values %emit_code ) {
+    next unless $f->[1];
     $functions .= <<EOT;
 sub $f->[0] { $f->[1]}
 EOT
