@@ -11,9 +11,11 @@ my( %map, %emit_code, $map, $functions );
 
 my $contents = my $original_contents = read_file( $file );
 
-my( $event, $class, $macro, $args );
+my( $event, $class, $macro, $args, $line_count );
 
-foreach my $line ( split /\n+/, $contents ) {
+foreach my $line ( split /\n/, $contents ) {
+    ++$line_count;
+
     if( $line =~ /^=head2 C<([a-zA-Z0-9_:]+)>/ ) {
         $class = $1;
         $event = undef;
@@ -27,7 +29,7 @@ foreach my $line ( split /\n+/, $contents ) {
 
     if( $line =~ /^=for generator (\w+)(?: (.*))?$/ ) {
         ( $macro, $args ) = ( $1, $2 );
-        die "No class/event" unless $class && $event;
+        die "No class/event at line $line_count" unless $class && $event;
     } else {
         next;
     }
@@ -45,6 +47,9 @@ foreach my $line ( split /\n+/, $contents ) {
         no strict 'refs';
         \&{"Wx::Event::$macro"};
     };
+
+    die "Unable to determine binder type for '$macro'"
+      unless defined prototype $macro_ref;
 
     $emit_code{$macro} ||= [ $function, '' ];
     $emit_code{$macro}[1] .= $emit_code;
