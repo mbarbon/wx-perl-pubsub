@@ -6,6 +6,7 @@ META.yml
 lib/Wx/Perl/PubSub.pm
 lib/Wx/Perl/PubSub/Events.pm
 scripts/make_event_list.pl
+scripts/test_controls.pl
 t/001_load.t
 t/002_base.t
 t/002_global.t
