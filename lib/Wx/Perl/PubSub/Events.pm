@@ -228,6 +228,38 @@ sub _Wx_ScrollBar_Scroll {
 
 1;
 
+# TODO: classes/events that need to be added
+# wxBitmapButton
+# wxBitmapComboBox
+# wxCalendarCtrl
+# wxChoiceBook, wxListbook, wxNotebook, wxToolbook, wxTreebook
+# wxCollapsiblePane
+# wxColourPickerCtrl
+# wxComboCtrl
+# wxDataViewCtrl
+# wxDatePickerCtrl
+# wxDirPickerCtrl
+# wxEditableListBox
+# wxFileCtrl
+# wxFilePickerCtrl
+# wxFindReplaceDialog
+# wxFontPickerCtrl
+# wxGridCtrl
+# wxHtmlListBox
+# wxHtmlWindow
+# wxHyperlinkCtrl
+# wxListCtrl, wxListView
+# wxProcess
+# wxSashWindow
+# wxSearchCtrl
+# wxSocket
+# wxSplitterWindow
+# wxStyledTextCtrl
+# wxToolBar, wxMenuBar
+# wxTreeCtrl
+# wxWindow: wxCloseEvent, wxContextMenuEvent, wxHelpEvent
+# wxWizard
+
 __DATA__
 
 =head1 NAME
