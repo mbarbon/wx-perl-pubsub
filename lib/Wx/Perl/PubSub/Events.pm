@@ -139,7 +139,7 @@ our %SIGNAL_MAP =
           'Wx::ComboBox' =>
               [ 3, \&Wx::Event::EVT_TEXT, \&_Wx_ComboBox_TextChanged ],
           'Wx::TextCtrl' =>
-              [ 3, \&Wx::Event::EVT_TEXT, \&_Wx_ComboBox_TextChanged ],
+              [ 3, \&Wx::Event::EVT_TEXT, \&_Wx_TextCtrl_TextChanged ],
           ],
     'Timeout' =>
         [
@@ -168,13 +168,14 @@ sub _Wx_CheckBox_Toggled { emit_event( $_[0], $_[1], 'Toggled', $_[1]->IsChecked
 sub _Wx_CheckListBox_ItemToggled { emit_event( $_[0], $_[1], 'ItemToggled', $_[1]->GetInt, $_[0]->IsChecked( $_[1]->GetInt ) ); }
 sub _Wx_Choice_ItemSelected { emit_event( $_[0], $_[1], 'ItemSelected', $_[1]->GetSelection ); emit_event( $_[0], $_[1], 'StringSelected', $_[1]->GetString ); }
 sub _Wx_ComboBox_ItemSelected { emit_event( $_[0], $_[1], 'ItemSelected', $_[1]->GetSelection ); emit_event( $_[0], $_[1], 'StringSelected', $_[0]->GetValue ); }
-sub _Wx_ComboBox_TextChanged { emit_event( $_[0], $_[1], 'TextChanged', $_[1]->GetString ); emit_event( $_[0], $_[1], 'TextChanged', $_[1]->GetString ); }
+sub _Wx_ComboBox_TextChanged { emit_event( $_[0], $_[1], 'TextChanged', $_[1]->GetString ); }
 sub _Wx_ListBox_ItemDoubleClicked { emit_event( $_[0], $_[1], 'ItemDoubleClicked', $_[1]->GetInt ); }
 sub _Wx_ListBox_ItemSelected { emit_event( $_[0], $_[1], 'ItemSelected', $_[1]->GetSelection ); emit_event( $_[0], $_[1], 'StringSelected', $_[1]->GetString ); }
 sub _Wx_RadioBox_ItemSelected { emit_event( $_[0], $_[1], 'ItemSelected', $_[1]->GetSelection ); }
 sub _Wx_RadioButton_Toggled { emit_event( $_[0], $_[1], 'Toggled', $_[0]->GetValue ); }
 sub _Wx_TextCtrl_EnterPressed { emit_event( $_[0], $_[1], 'EnterPressed' ); }
 sub _Wx_TextCtrl_LengthExceeded { emit_event( $_[0], $_[1], 'LengthExceeded' ); }
+sub _Wx_TextCtrl_TextChanged { emit_event( $_[0], $_[1], 'TextChanged', $_[1]->GetString ); }
 sub _Wx_Timer_Timeout { emit_event( $_[0], $_[1], 'Timeout' ); }
 sub _Wx_ToggleButton_Toggled { emit_event( $_[0], $_[1], 'Toggled', $_[1]->IsChecked ); }
 sub _Wx_Window_Destroyed { emit_event( $_[0], $_[1], 'Destroyed', $_[0] ); }

@@ -58,17 +58,19 @@ foreach my $line ( split /\n/, $contents ) {
     die "Unable to determine binder type for '$macro'"
       unless defined prototype $macro_ref;
 
-    $emit_code{$macro} ||= [ $function, '' ];
-    $emit_code{$macro}[1] .= $emit_code;
+    $emit_code{$class}{$macro} ||= [ $function, '' ];
+    $emit_code{$class}{$macro}[1] .= $emit_code;
     $map{$event}{$class} = [ length prototype $macro_ref, $macro,
-                             $emit_code{$macro}[0] ];
+                             $emit_code{$class}{$macro}[0] ];
 }
 
-foreach my $f ( sort { $a->[0] cmp $b->[0] } values %emit_code ) {
-    next unless $f->[1];
-    $functions .= <<EOT;
+foreach my $c ( sort { $a cmp $b } keys %emit_code ) {
+    foreach my $f ( sort { $a->[0] cmp $b->[0] } values %{$emit_code{$c}} ) {
+        next unless $f->[1];
+        $functions .= <<EOT;
 sub $f->[0] { $f->[1]}
 EOT
+    }
 }
 
 foreach my $event ( sort keys %map ) {
