@@ -16,6 +16,16 @@ our %SIGNAL_MAP =
 ### THIS SECTION IS GENERATED: TO CHANGE IT, CHANGE THE POD BELOW ###
 ### BEGIN EVENTS ###
 
+    'ArrowDown' =>
+        [
+          'Wx::SpinButton' =>
+              [ 3, \&Wx::Event::EVT_SPIN_DOWN, \&_Wx_SpinButton_ArrowDown ],
+          ],
+    'ArrowUp' =>
+        [
+          'Wx::SpinButton' =>
+              [ 3, \&Wx::Event::EVT_SPIN_UP, \&_Wx_SpinButton_ArrowUp ],
+          ],
     'Clicked' =>
         [
           'Wx::Button' =>
@@ -68,6 +78,10 @@ our %SIGNAL_MAP =
               [ 2, \&Wx::Event::EVT_SCROLL, \&_Wx_ScrollBar_Scroll ],
           'Wx::Slider' =>
               [ 2, \&Wx::Event::EVT_SCROLL, \&_Wx_ScrollBar_Scroll ],
+          'Wx::SpinButton' =>
+              [ 3, \&Wx::Event::EVT_SPIN, \&_Wx_SpinButton_PositionChanged ],
+          'Wx::SpinCtrl' =>
+              [ 3, \&Wx::Event::EVT_SPINCTRL, \&_Wx_SpinCtrl_PositionChanged ],
           ],
     'ScrollBottom' =>
         [
@@ -138,6 +152,8 @@ our %SIGNAL_MAP =
         [
           'Wx::ComboBox' =>
               [ 3, \&Wx::Event::EVT_TEXT, \&_Wx_ComboBox_TextChanged ],
+          'Wx::SpinCtrl' =>
+              [ 3, \&Wx::Event::EVT_TEXT, \&_Wx_SpinCtrl_TextChanged ],
           'Wx::TextCtrl' =>
               [ 3, \&Wx::Event::EVT_TEXT, \&_Wx_TextCtrl_TextChanged ],
           ],
@@ -173,6 +189,11 @@ sub _Wx_ListBox_ItemDoubleClicked { emit_event( $_[0], $_[1], 'ItemDoubleClicked
 sub _Wx_ListBox_ItemSelected { emit_event( $_[0], $_[1], 'ItemSelected', $_[1]->GetSelection ); emit_event( $_[0], $_[1], 'StringSelected', $_[1]->GetString ); }
 sub _Wx_RadioBox_ItemSelected { emit_event( $_[0], $_[1], 'ItemSelected', $_[1]->GetSelection ); }
 sub _Wx_RadioButton_Toggled { emit_event( $_[0], $_[1], 'Toggled', $_[0]->GetValue ); }
+sub _Wx_SpinButton_ArrowDown { emit_event( $_[0], $_[1], 'ArrowDown', $_[1]->GetPosition ); }
+sub _Wx_SpinButton_ArrowUp { emit_event( $_[0], $_[1], 'ArrowUp', $_[1]->GetPosition ); }
+sub _Wx_SpinButton_PositionChanged { emit_event( $_[0], $_[1], 'PositionChanged', $_[1]->GetPosition ); }
+sub _Wx_SpinCtrl_PositionChanged { emit_event( $_[0], $_[1], 'PositionChanged', $_[1]->GetInt ); }
+sub _Wx_SpinCtrl_TextChanged { emit_event( $_[0], $_[1], 'TextChanged', $_[1]->GetString ); }
 sub _Wx_TextCtrl_EnterPressed { emit_event( $_[0], $_[1], 'EnterPressed' ); }
 sub _Wx_TextCtrl_LengthExceeded { emit_event( $_[0], $_[1], 'LengthExceeded' ); }
 sub _Wx_TextCtrl_TextChanged { emit_event( $_[0], $_[1], 'TextChanged', $_[1]->GetString ); }
@@ -393,6 +414,35 @@ Emitted when a radio button is toggled.
 =head3 C<ScrollThumbRelease( $position )>
 
 =for generator EVT_SCROLL bind _Wx_ScrollBar_Scroll
+
+=head2 C<Wx::SpinButton>
+
+=head3 C<PositionChanged( $position )>
+
+=for generator EVT_SPIN $_[1]->GetPosition
+
+=head3 C<ArrowUp( $position )>
+
+=for generator EVT_SPIN_UP $_[1]->GetPosition
+
+=head3 C<ArrowDown( $position )>
+
+=for generator EVT_SPIN_DOWN $_[1]->GetPosition
+
+=head2 C<Wx::SpinCtrl>
+
+=head3 C<PositionChanged( $position )>
+
+=for generator EVT_SPINCTRL $_[1]->GetInt
+
+Emitted when the value is changed using the arrow buttons.
+
+=head3 C<TextChanged( $text )>
+
+=for generator EVT_TEXT $_[1]->GetString
+
+Emitted when the text is edited or the position is changed using the
+arrow buttons; takes the modified string as parameter.
 
 =head2 C<Wx::TextCtrl>
 

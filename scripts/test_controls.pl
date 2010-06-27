@@ -94,6 +94,16 @@ sub _create_controls {
                          'ScrollPageDown', 'ScrollThumbTrack',
                          'ScrollThumbRelease' );
 
+    my $spinbutton = Wx::SpinButton->new( $list, -1 );
+    $spinbutton->SetRange( 5, 20 );
+    $self->_add_control( 'wxSpinButton', $spinbutton,
+                         'PositionChanged', 'ArrowUp', 'ArrowDown' );
+
+    my $spinctrl = Wx::SpinCtrl->new( $list, -1, "12" );
+    $spinctrl->SetRange( 5, 20 );
+    $self->_add_control( 'wxSpinCtrl', $spinctrl,
+                         'PositionChanged', 'TextChanged' );
+
     my $textctrl = Wx::TextCtrl->new( $list, -1, 'Edit me', [-1, -1], [-1, -1],
                                       wxTE_PROCESS_ENTER );
     $textctrl->SetMaxLength( 20 );
