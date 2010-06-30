@@ -52,6 +52,10 @@ sub _create_controls {
     $self->_add_control( 'wxChoice', $choice,
                          'ItemSelected', 'StringSelected' );
 
+    my $collpane = Wx::CollapsiblePane->new( $list, -1, "Stuff" );
+    Wx::StaticText->new( $collpane->GetPane, -1, "More stuff" );
+    $self->_add_control( 'wxCollapsiblePane', $collpane, 'CollapsedState' );
+
     my $combobox = Wx::ComboBox->new( $list, -1, "Default", [-1, -1], [-1, -1],
                                       [ qw(One Two Three) ] );
     $self->_add_control( 'wxComboBox', $combobox,

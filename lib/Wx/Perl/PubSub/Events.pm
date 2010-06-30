@@ -31,6 +31,11 @@ our %SIGNAL_MAP =
           'Wx::Button' =>
               [ 3, \&Wx::Event::EVT_BUTTON, \&_Wx_Button_Clicked ],
           ],
+    'CollapsedState' =>
+        [
+          'Wx::CollapsiblePane' =>
+              [ 3, \&Wx::Event::EVT_COLLAPSIBLEPANE_CHANGED, \&_Wx_CollapsiblePane_CollapsedState ],
+          ],
     'Destroyed' =>
         [
           'Wx::Window' =>
@@ -183,6 +188,7 @@ sub _Wx_Button_Clicked { emit_event( $_[0], $_[1], 'Clicked' ); }
 sub _Wx_CheckBox_Toggled { emit_event( $_[0], $_[1], 'Toggled', $_[1]->IsChecked ); }
 sub _Wx_CheckListBox_ItemToggled { emit_event( $_[0], $_[1], 'ItemToggled', $_[1]->GetInt, $_[0]->IsChecked( $_[1]->GetInt ) ); }
 sub _Wx_Choice_ItemSelected { emit_event( $_[0], $_[1], 'ItemSelected', $_[1]->GetSelection ); emit_event( $_[0], $_[1], 'StringSelected', $_[1]->GetString ); }
+sub _Wx_CollapsiblePane_CollapsedState { emit_event( $_[0], $_[1], 'CollapsedState', $_[1]->GetCollapsed ); }
 sub _Wx_ComboBox_ItemSelected { emit_event( $_[0], $_[1], 'ItemSelected', $_[1]->GetSelection ); emit_event( $_[0], $_[1], 'StringSelected', $_[0]->GetValue ); }
 sub _Wx_ComboBox_TextChanged { emit_event( $_[0], $_[1], 'TextChanged', $_[1]->GetString ); }
 sub _Wx_ListBox_ItemDoubleClicked { emit_event( $_[0], $_[1], 'ItemDoubleClicked', $_[1]->GetInt ); }
@@ -233,7 +239,6 @@ sub _Wx_ScrollBar_Scroll {
 # wxBitmapComboBox
 # wxCalendarCtrl
 # wxChoiceBook, wxListbook, wxNotebook, wxToolbook, wxTreebook
-# wxCollapsiblePane
 # wxColourPickerCtrl
 # wxComboCtrl
 # wxDataViewCtrl
@@ -307,6 +312,14 @@ parameter.
 
 Emitted when a choice item is selected; takes the item string as
 parameter.
+
+=head2 C<Wx::CollapsiblePane>
+
+=head3 C<CollapsedState( $collapsed )>
+
+=for generator EVT_COLLAPSIBLEPANE_CHANGED $_[1]->GetCollapsed
+
+Emitted when the collapsed/expanded state of the pane changes.
 
 =head2 C<Wx::ComboBox>
 
