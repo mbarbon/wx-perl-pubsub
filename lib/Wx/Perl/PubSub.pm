@@ -67,7 +67,8 @@ use Wx::Perl::PubSub::Events;
 use Scalar::Util qw(refaddr weaken blessed);
 use Exporter qw();
 
-our @EXPORT_OK = qw(emit subscribe unsubscribe sender wx_event);
+our @EXPORT_OK = qw(emit subscribe unsubscribe sender wx_event
+                    register_event emit_event);
 our %EXPORT_TAGS =
   ( all     => \@EXPORT_OK,
     local   => [ 'subscribe', 'unsubscribe' ],
@@ -386,6 +387,31 @@ sub emit_event {
 
     local $WX_EVENT = $event;
     emit( $sender, $signal, @args );
+}
+
+=head2 C<register_event>
+
+    use Wx::Perl::PubSub qw(register_event emit_event);
+
+    sub _emitter { emit_event( $_[0], $_[1], 'FooBar', $_[1]->GetUsefulValue ) }
+    register_event( 'FooBar', 'Wx::FooCtrl', \&Wx::Event::EVT_FOO_BAR, undef,
+                    \&_emitter );
+
+Adds custom signal associated with a wxWidgets event.
+
+=cut
+
+sub register_event {
+    my( $signal, $class, $binder, $arg_count, $emitter ) = @_;
+    my $classes = $SIGNAL_MAP{$signal} ||= [];
+    $arg_count ||= length( prototype( $binder ) );
+
+    for( my $i = 0; $i < $#$classes; $i += 2 ) {
+        die "Duplicate signal entry for signal '$signal' of class '$class'"
+            if $classes->[$i] eq $class;
+    }
+
+    push @$classes, $class => [ $arg_count, $binder, $emitter ];
 }
 
 =head1 SEE ALSO

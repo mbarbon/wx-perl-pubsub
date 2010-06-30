@@ -14,4 +14,5 @@ t/003_simple_gc.t
 t/004_unsubscribe.t
 t/005_unsubscribe_wildcards.t
 t/006_sender_event.t
+t/007_register_signal.t
 t/lib/PubSub.pm
